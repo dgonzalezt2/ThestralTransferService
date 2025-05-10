@@ -21,13 +21,11 @@ using (var scope = host.Services.CreateScope())
     logger.LogInformation("Database created successfully or already exists.");
 }
 
-// create the rabbitmq queues and fan-out exchange
 using (var scope = host.Services.CreateScope())
 {
     var connectionFactory = scope.ServiceProvider.GetRequiredService<ConnectionFactory>();
     using var connection = connectionFactory.CreateConnection();
     using var channel = connection.CreateModel();
-    // get from IOptions<ConsumerConfiguration>
     var queues = scope.ServiceProvider.GetRequiredService<IOptions<ConsumerConfiguration>>().Value;
     var transferUserReplyQueue = queues.TransferUserReplyQueue;
     var transferUserQueue = queues.TransferUserQueue;
@@ -57,11 +55,11 @@ using (var scope = host.Services.CreateScope())
     var userAuthExchangeQueue = publisherQueues.UserAuthExchangeQueue;
     var userManagementExchange = publisherQueues.UserManagementExchange;
     var fileManagerExchangeQueue = publisherQueues.FileManagerExchangeQueue;
-    channel.QueueDeclare(queue: userAuthExchangeQueue, durable: true, exclusive: false, autoDelete: false, arguments: null);
+    //channel.QueueDeclare(queue: userAuthExchangeQueue, durable: true, exclusive: false, autoDelete: false, arguments: null);
     channel.QueueBind(queue: userAuthExchangeQueue, exchange: userTransferRequestBroadcastQueue, routingKey: "");
-    channel.QueueDeclare(queue: userManagementExchange, durable: true, exclusive: false, autoDelete: false, arguments: null);
+    //channel.QueueDeclare(queue: userManagementExchange, durable: true, exclusive: false, autoDelete: false, arguments: null);
     channel.QueueBind(queue: userManagementExchange, exchange: userTransferRequestBroadcastQueue, routingKey: "");
-    channel.QueueDeclare(queue: fileManagerExchangeQueue, durable: true, exclusive: false, autoDelete: false, arguments: null);
+    //channel.QueueDeclare(queue: fileManagerExchangeQueue, durable: true, exclusive: false, autoDelete: false, arguments: null);
     channel.QueueBind(queue: fileManagerExchangeQueue, exchange: userTransferRequestBroadcastQueue, routingKey: "");
 }
 
